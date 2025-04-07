@@ -7,6 +7,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider } from "./context/AuthContext";
+import { StoreProvider } from "./context/StoreContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -18,11 +19,13 @@ root.render(
       enableSystem
       disableTransitionOnChange
     >
-      <LanguageProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </LanguageProvider>
+      <StoreProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </LanguageProvider>
+      </StoreProvider>
     </ThemeProvider>
   </BrowserRouter>
   // </React.StrictMode>

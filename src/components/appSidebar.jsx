@@ -17,6 +17,7 @@ import {
   LogOut,
   MoreHorizontal,
   Settings,
+  Share2,
   Sparkles,
   Trash2,
   User2,
@@ -108,14 +109,19 @@ export function AppSidebar() {
               <MenuItemComponent
                 Icon={Home}
                 url={"/dashboard"}
-                title={"Home"}
+                title={"Projects"}
+              />
+              <MenuItemComponent
+                Icon={Share2}
+                url={"/"}
+                title={"Shared"}
               />
               <MenuItemComponent
                 Icon={LayoutTemplate}
                 url={"/"}
-                title={"Templates"}
+                title={"Templetes"}
               />
-              <MenuItemComponent Icon={Trash2} url={"/"} title={"Trash"} />
+              <MenuItemComponent Icon={Trash2} url={"/trash"} title={"Trash"} />
               <MenuItemComponent Icon={Settings} url={"/"} title={"Settings"} />
             </SidebarMenu>
           </SidebarGroupContent>

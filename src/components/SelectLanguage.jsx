@@ -21,7 +21,7 @@ export default function SelectLanguage() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" className="rounded-full">
           <Globe />
         </Button>
       </DropdownMenuTrigger>

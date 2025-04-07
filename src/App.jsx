@@ -5,10 +5,12 @@ import ForgetPasswordPage from "./pages/Auth/ForgetPassword";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
 import ResetPasswordPage from "./pages/Auth/ResetPasssword";
-import UserRoot from "./pages/User/UserRoot";
-import UserDashboard from "./pages/User/UserDashboard";
-import UserCourses from "./pages/User/UserCourses";
-import UserSettings from "./pages/User/UserSettings";
+import DashboardPage from "./pages/DashboardPages/Dashboard";
+import DashboardLayout from "./pages/DashboardPages/DashboardLayout";
+import CreatePage from "./pages/DashboardPages/CreatePage";
+import SelectTheme from "./pages/PresentationPages/SelectTheme";
+import Presentation from "./pages/PresentationPages/Presentation";
+import Trash from "./pages/DashboardPages/Trash/Trash";
 
 function App() {
   return (
@@ -22,11 +24,16 @@ function App() {
           <Route path="/resetPassword" element={<ResetPasswordPage />} />
         </Route>
         {/* User */}
-        <Route element={<UserRoot />}>
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/my-courses/:courseType" element={<UserCourses />} />
-          <Route path="/settings" element={<UserSettings />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/create-page" element={<CreatePage />} />
+          <Route path="/trash" element={<Trash />} />
         </Route>
+        <Route
+          path="/presentation/:id/select-theme"
+          element={<SelectTheme />}
+        />
+        <Route path="/presentation/:id" element={<Presentation />} />
       </Routes>
       <Toaster />
     </>

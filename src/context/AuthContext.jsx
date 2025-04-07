@@ -13,30 +13,30 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const userToken = Cookie.get("token");
-    if (userToken) {
-      const getProfile = async () => {
-        try {
-          setLoading(true);
-          const { data } = await axios.get(`${BaseUrlApi}/me`);
-          setUser(data);
-        } catch (error) {
-          Cookie.remove("token");
-          setUser(null);
-          navigate("/login");
-          toast("Error", {
-            description: ErrorMessage(error),
-          });
-        } finally {
-          setLoading(false);
-        }
-      };
-      getProfile();
-    } else {
-      setLoading(false);
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const userToken = Cookie.get("token");
+  //   if (userToken) {
+  //     const getProfile = async () => {
+  //       try {
+  //         setLoading(true);
+  //         const { data } = await axios.get(`${BaseUrlApi}/me`);
+  //         setUser(data);
+  //       } catch (error) {
+  //         Cookie.remove("token");
+  //         setUser(null);
+  //         navigate("/login");
+  //         toast("Error", {
+  //           description: ErrorMessage(error),
+  //         });
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
+  //     getProfile();
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // }, [navigate]);
 
   useEffect(() => {
     const urlToken = new URLSearchParams(window.location.search).get("token");
@@ -55,24 +55,24 @@ export const AuthProvider = ({ children }) => {
   const { changeLanguage } = useLanguage();
 
   // Send Timezone
-  useMemo(() => {
-    console.log("callBack Timezone");
-    axios.get("https://ipinfo.io/json").then(({ data }) => {
-      if (!!data) {
-        axios
-          .post(`${BaseUrlApi}/timezone/${data.country}`)
-          .then(({ data }) => {
-            const isLangExist = Cookie.get("language");
-            if (!isLangExist) changeLanguage(data.trim());
-          })
-          .catch((error) => {
-            toast("Error", {
-              description: ErrorMessage(error),
-            });
-          });
-      }
-    });
-  }, [changeLanguage]);
+  // useMemo(() => {
+  //   console.log("callBack Timezone");
+  //   axios.get("https://ipinfo.io/json").then(({ data }) => {
+  //     if (!!data) {
+  //       axios
+  //         .post(`${BaseUrlApi}/timezone/${data.country}`)
+  //         .then(({ data }) => {
+  //           const isLangExist = Cookie.get("language");
+  //           if (!isLangExist) changeLanguage(data.trim());
+  //         })
+  //         .catch((error) => {
+  //           toast("Error", {
+  //             description: ErrorMessage(error),
+  //           });
+  //         });
+  //     }
+  //   });
+  // }, [changeLanguage]);
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
