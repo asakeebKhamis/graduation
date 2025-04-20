@@ -1,6 +1,6 @@
 import UploadImage from "./UploadImage";
 
-const CustomImage = ({
+const   CustomImage = ({
   src,
   alt,
   className,

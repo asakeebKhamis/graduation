@@ -1,10 +1,11 @@
+"use client";
+
 import { useState } from "react";
 import { ForgetPasswordData } from "../../lib/languages";
 import { useLanguage } from "../../context/LanguageContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { BaseUrlApi, ErrorMessage } from "../../lib/api";
-import axios from "axios";
+import { authAPI, ErrorMessage } from "../../lib/api";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -28,9 +29,7 @@ export default function ForgetPasswordPage() {
     try {
       setLoading(true);
       setErrors([]);
-      await axios.post(`${BaseUrlApi}/forgot-password`, {
-        email,
-      });
+      await authAPI.forgotPassword(email);
       toast("Code Sent", {
         description: "Check your email for the verification code.",
       });
@@ -41,7 +40,6 @@ export default function ForgetPasswordPage() {
       setLoading(false);
     }
   };
-  console.log(errors);
 
   return (
     <div

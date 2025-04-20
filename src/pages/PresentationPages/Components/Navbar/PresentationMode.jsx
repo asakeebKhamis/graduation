@@ -16,7 +16,7 @@ const PresentationMode = ({ onClose }) => {
   };
 
   const goToNextSlide = () => {
-    if (currentSlideIndex == slides.length - 1) {
+    if (currentSlideIndex === slides.length - 1) {
       onClose();
     } else {
       setCurrentSlideIndex((prev) => Math.min(prev + 1, slides.length - 1));
@@ -40,7 +40,20 @@ const PresentationMode = ({ onClose }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [slides.length, currentSlideIndex]);
+  }, [slides.length, currentSlideIndex, onClose]);
+
+  if (slides.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-white text-center">
+          <h2 className="text-2xl mb-4">No slides available</h2>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
@@ -49,7 +62,7 @@ const PresentationMode = ({ onClose }) => {
         style={{
           aspectRatio: "16/9",
           maxHeight: "100vh",
-          maxWidth: "177.78vh",
+          maxWidth: "177.78vh", // 16:9 aspect ratio
         }}
       >
         <AnimatePresence mode="wait">
@@ -59,7 +72,9 @@ const PresentationMode = ({ onClose }) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.2 }}
             transition={{ duration: 0.5 }}
-            className={`w-full h-full pointer-events-none ${slides[currentSlideIndex].className}`}
+            className={`w-full h-full overflow-auto p-8 ${
+              slides[currentSlideIndex]?.className || ""
+            }`}
             style={{
               backgroundColor: currentTheme.slideBackgroundColor,
               backgroundImage: currentTheme.gradientBackground,
@@ -91,13 +106,21 @@ const PresentationMode = ({ onClose }) => {
             variant="outline"
             size="icon"
             onClick={goToPreviousSlide}
-            disabled={currentSlideIndex == 0}
+            disabled={currentSlideIndex === 0}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
+          <span className="text-white px-4 py-2">
+            {currentSlideIndex + 1} / {slides.length}
+          </span>
           {!isLastSlide && (
             <Button variant="outline" size="icon" onClick={goToNextSlide}>
               <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+          {isLastSlide && (
+            <Button variant="outline" onClick={onClose}>
+              Exit
             </Button>
           )}
         </div>

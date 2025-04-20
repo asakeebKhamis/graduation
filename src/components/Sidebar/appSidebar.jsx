@@ -40,14 +40,14 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "../components/ui/sidebar";
+} from "../ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../components/ui/collapsible";
-import { useLanguage } from "../context/LanguageContext";
-import { SidebarData } from "../lib/languages";
+} from "../ui/collapsible";
+import { useLanguage } from "../../context/LanguageContext";
+import { SidebarData } from "../../lib/languages";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -57,8 +57,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { useAuth } from "../../context/AuthContext";
+import { Skeleton } from "../ui/skeleton";
+import NavProjects from "./NavProjects";
 
 const LogoSideBar = ({ logoName }) => {
   const { theme } = useTheme();
@@ -106,23 +109,23 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <MenuItemComponent
-                Icon={Home}
-                url={"/dashboard"}
-                title={"Projects"}
-              />
+              <MenuItemComponent Icon={Home} url={"/"} title={"Projects"} />
               <MenuItemComponent
                 Icon={Share2}
-                url={"/"}
+                url={"/shared"}
                 title={"Shared"}
               />
               <MenuItemComponent
                 Icon={LayoutTemplate}
-                url={"/"}
+                url={"/templetes"}
                 title={"Templetes"}
               />
               <MenuItemComponent Icon={Trash2} url={"/trash"} title={"Trash"} />
-              <MenuItemComponent Icon={Settings} url={"/"} title={"Settings"} />
+              <MenuItemComponent
+                Icon={Settings}
+                url={"/settings"}
+                title={"Settings"}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -213,74 +216,8 @@ const CollapsComponent = ({ Icon, title, items }) => {
   );
 };
 
-const NavProjects = () => {
-  const { isMobile } = useSidebar();
-
-  const projects = [
-    {
-      name: "Project1",
-      url: "/dashboard",
-    },
-    {
-      name: "Project2",
-      url: "/dashboard",
-    },
-    {
-      name: "Project3",
-      url: "/dashboard",
-    },
-    {
-      name: "Project4",
-      url: "/dashboard",
-    },
-  ];
-
-  return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
-      <SidebarMenu>
-        {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <Link to={item.url}>
-                <span className="truncate">{item.name}</span>
-              </Link>
-            </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Forward className="text-muted-foreground" />
-                  <span>Share Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete Project</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
-  );
-};
-
 export function NavUser() {
+  const { user, logout } = useAuth();
   const { isMobile } = useSidebar();
 
   return (
@@ -298,8 +235,8 @@ export function NavUser() {
                 className="size-8 object-cover"
               />
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Mahmood Khamis</span>
-                <span className="truncate text-xs">Khamis@gmail.com</span>
+                <span className="truncate font-semibold">{user?.name}</span>
+                <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -318,8 +255,8 @@ export function NavUser() {
                   className="size-8 object-cover"
                 />
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Mahmood Khamis</span>
-                  <span className="truncate text-xs">Khamis@gmail.com</span>
+                  <span className="truncate font-semibold">{user?.name}</span>
+                  <span className="truncate text-xs">{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -346,7 +283,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

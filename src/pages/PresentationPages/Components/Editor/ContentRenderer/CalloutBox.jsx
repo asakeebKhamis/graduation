@@ -56,8 +56,8 @@ const CalloutBox = ({ type, children, className }) => {
         className
       )}
     >
-      <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-      <div className="flex-1">{children}</div>
+      <Icon className="w-5 h-5 mt-0.5" />
+      <div className="w-full">{children}</div>
     </div>
   );
 };

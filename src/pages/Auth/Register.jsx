@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RegisterData } from "../../lib/languages";
 import Cookie from "js-cookie";
 import axios from "axios";
-import { BaseUrlApi, ErrorMessage } from "../../lib/api";
+import { authAPI, BaseUrlApi, ErrorMessage } from "../../lib/api";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -41,7 +41,8 @@ export default function RegisterPage() {
     try {
       setLoading(true);
       setErrors({});
-      const { data } = await axios.post(`${BaseUrlApi}/register`, form);
+      const { data } = await authAPI.register(form);
+
       Cookie.set("token", data.token);
       FireWorks();
       setOpen(true);

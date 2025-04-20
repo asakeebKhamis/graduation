@@ -11,13 +11,14 @@ import CreatePage from "./pages/DashboardPages/CreatePage";
 import SelectTheme from "./pages/PresentationPages/SelectTheme";
 import Presentation from "./pages/PresentationPages/Presentation";
 import Trash from "./pages/DashboardPages/Trash/Trash";
+import ProjectForm from "./pages/PresentationPages/project-form";
 
 function App() {
   return (
     <>
       <Routes>
         <Route element={<HeaderPage />}>
-          <Route path="/" element={<div>Home</div>} />
+          {/* <Route path="/" element={<div>Home</div>} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgetPassword" element={<ForgetPasswordPage />} />
@@ -25,15 +26,20 @@ function App() {
         </Route>
         {/* User */}
         <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/create-page" element={<CreatePage />} />
           <Route path="/trash" element={<Trash />} />
+          <Route path="/project-form" element={<ProjectForm />} />
         </Route>
         <Route
           path="/presentation/:id/select-theme"
           element={<SelectTheme />}
         />
         <Route path="/presentation/:id" element={<Presentation />} />
+        <Route
+          path="/share/:id"
+          element={<Presentation isEditable={false} />}
+        />
       </Routes>
       <Toaster />
     </>

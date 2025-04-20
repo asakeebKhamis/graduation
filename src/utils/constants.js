@@ -108,7 +108,7 @@ export const themes = [
   },
   {
     name: "Midnight",
-    fontFamily: "'Courier New', monospace",
+    fontFamily: "'Roboto', sans-serif",
     fontColor: "#cfcfcf",
     backgroundColor: "#0d0d0d",
     slideBackgroundColor: "#262626",

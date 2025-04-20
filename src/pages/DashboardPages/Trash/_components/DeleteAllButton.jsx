@@ -13,11 +13,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "src/components/ui/alert-dialog";
+import { presentationAPI } from "../../../../lib/api";
+import { useNavigate } from "react-router-dom";
 
 const DeleteAllButton = ({ Projects }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  //   const router = useRouter();
+  const navigate = useNavigate();
 
   const handleDeleteAllProjects = async () => {
     setLoading(true);
@@ -30,13 +32,12 @@ const DeleteAllButton = ({ Projects }) => {
     }
 
     try {
-      //   const res = await deleteAllProjects(
-      //     Projects.map((project) => project.id)
-      //   );
-      //   if (res.status !== 200) {
-      //     throw new Error("Failed to delete all projects");
-      //   }
-      //   router.refresh();
+      const res = await presentationAPI.emptyTrash();
+
+      if (res.status !== 200) {
+        throw new Error("Failed to delete all projects");
+      }
+      navigate(0);
     } catch (error) {
       console.error(error);
       toast.error("Error", {
@@ -49,7 +50,7 @@ const DeleteAllButton = ({ Projects }) => {
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"

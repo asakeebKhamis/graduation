@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { cn } from "../../../../lib/utils";
+"use client";
+
+import { useState } from "react";
+import { cn, timeAgo } from "../../../../lib/utils";
 import { motion } from "framer-motion";
 import AlertDialog from "./AlertDialog";
 import { toast } from "sonner";
@@ -10,7 +12,12 @@ import {
 } from "../../../../utils/motionVariants";
 import { MasterRecursiveComponent } from "../../../PresentationPages/Components/Editor/MasterRecursiveComponent";
 import { useStore } from "../../../../context/StoreContext";
-import { Image } from "lucide-react";
+import { ImageIcon } from "lucide-react";
+import { presentationAPI, ErrorMessage } from "../../../../lib/api";
+import { useNavigate } from "react-router-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { themes } from "../../../../utils/constants";
 
 export default function Projects({ projects }) {
   return (
@@ -23,7 +30,7 @@ export default function Projects({ projects }) {
       {projects.map((project, id) => (
         <ProjectCard
           key={id}
-          projectId={project?.id}
+          projectId={project?._id}
           title={project?.title}
           createdAt={project?.createdAt?.toString()}
           isDelete={project?.isDeleted}
@@ -43,53 +50,16 @@ const ProjectCard = ({
   title,
   isDelete = false,
 }) => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [slides, setSlides] = useState([]);
 
-  const { slide } = useStore();
+  const { setSlides } = useStore();
 
   const handleNavigation = () => {
-    // setSlides(JSON.parse(JSON.stringify(slideData)));
-    // router.push(`/presentation/${projectId}`);
-  };
-
-  // Theme
-  const Theme = {
-    name: "",
-    fontFamily: "",
-    fontColor: "",
-    backgroundColor: "",
-    slideBackgroundColor: "",
-    accentColor: "",
-    gradientBackground: "",
-    sidebarColor: "",
-    navbarColor: "",
-    type: "light" || "dark",
-  };
-
-  const timeAgo = (timestamp) => {
-    const now = new Date();
-    const diffInSeconds = Math.floor(
-      (now.getTime() - new Date(timestamp).getTime()) / 1000
-    );
-
-    const intervals = [
-      { label: "year", value: 60 * 60 * 24 * 365 },
-      { label: "month", value: 60 * 60 * 24 * 30 },
-      { label: "days", value: 60 * 60 * 24 },
-      { label: "hours", value: 60 * 60 },
-      { label: "mins", value: 60 },
-      { label: "sec", value: 1 },
-    ];
-
-    for (let i = 0; i < intervals.length; i++) {
-      const interval = intervals[i];
-      const count = Math.floor(diffInSeconds / interval.value);
-      if (count >= 1) {
-        return `${count} ${interval.label} ago `;
-      }
-    }
+    setSlides(JSON.parse(JSON.stringify(slideData)));
+    navigate(`/presentation/${projectId}`);
   };
 
   const handleRecover = async () => {
@@ -103,26 +73,29 @@ const ProjectCard = ({
     }
 
     try {
-      // const res = await recoverProject(projectId);
-      // const res = await Promise(() => setTimeout(() => {}, 3000));
+      const res = await presentationAPI.recover(projectId);
 
-      // if (res.status !== 200) {
-      //   toast.error("Oops!", {
-      //     description: res.error || "Something went wrong",
-      //   });
-      //   return;
-      // }
+      if (res.status !== 200) {
+        toast.error("Oops!", {
+          description: res.error || "Something went wrong",
+        });
+        return;
+      }
 
       setOpen(false);
-      // router.refresh();
       toast.success("Success", {
         description: "Project recovered successfully",
       });
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Recovery error:", error);
       toast.error("Oops!", {
-        description: "Something went wrong. Please contact support.",
+        description:
+          ErrorMessage(error) ||
+          "Something went wrong. Please contact support.",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,28 +110,33 @@ const ProjectCard = ({
     }
 
     try {
-      // const res = await deleteProject(projectId);
-      // const res = await Promise(() => setTimeout(() => {}, 3000));
+      const res = await presentationAPI.delete(projectId);
 
-      // if (res.status !== 200) {
-      //   toast.error("Oops!", {
-      //     description: res.error || "Failed to delete the project",
-      //   });
-      //   return;
-      // }
+      if (res.status !== 200) {
+        toast.error("Oops!", {
+          description: res.error || "Failed to delete the project",
+        });
+        return;
+      }
 
       setOpen(false);
-      // router.refresh();
       toast.success("Success", {
         description: "Project deleted successfully",
       });
+      navigate("/trash", { replace: true });
     } catch (error) {
-      console.error("Recovery error:", error);
+      console.error("Delete error:", error);
       toast.error("Oops!", {
-        description: "Something went wrong. Please contact support.",
+        description:
+          ErrorMessage(error) ||
+          "Something went wrong. Please contact support.",
       });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const currentTheme = themes.filter((theme) => theme.name === themeName)[0];
 
   return (
     <motion.div
@@ -167,33 +145,34 @@ const ProjectCard = ({
       }`}
       variants={itemVariants}
     >
-      <div
-        className="relative aspect-[16/10] rounded-lg cursor-pointer"
-        onClick={handleNavigation}
-      >
+      <div className="relative aspect-[16/10] rounded-lg cursor-pointer">
         <div
           className={cn(
             "w-full relative aspect-[16/9] rounded-lg overflow-hidden transition-all duration-200 p-2"
           )}
           style={{
-            fontFamily: Theme.fontFamily,
-            color: Theme.accentColor,
-            backgroundColor: Theme.slideBackgroundColor,
-            backgroundImage: Theme.gradientBackground,
+            fontFamily: currentTheme?.fontFamily,
+            color: currentTheme?.accentColor,
+            background:
+              currentTheme?.slideBackgroundColor ||
+              currentTheme?.gradientBackground,
           }}
+          onClick={handleNavigation}
         >
-          {slide ? (
+          {slideData.length !== 0 ? (
             <div className="scale-[0.5] origin-top-left w-[200%] h-[200%] overflow-hidden">
-              <MasterRecursiveComponent
-                slideId={JSON.parse(JSON.stringify(slideData))?.[0].id}
-                content={JSON.parse(JSON.stringify(slideData))?.[0].content}
-                onContentChange={() => {}}
-                isPreview={true}
-              />
+              <DndProvider backend={HTML5Backend}>
+                <MasterRecursiveComponent
+                  slideId={JSON.parse(JSON.stringify(slideData))?.[0]?._id}
+                  content={JSON.parse(JSON.stringify(slideData))?.[0]?.content}
+                  onContentChange={() => {}}
+                  isPreview={true}
+                />
+              </DndProvider>
             </div>
           ) : (
             <div className="w-full h-full bg-gray-400 flex justify-center items-center rounded-lg">
-              <Image className="w-6 h-6 text-gray-500" />
+              <ImageIcon className="w-6 h-6 text-gray-500" />
             </div>
           )}
         </div>
@@ -201,15 +180,14 @@ const ProjectCard = ({
         <div className="w-full">
           <div className="space-y-1">
             <h3 className="font-semibold text-base text-primary line-clamp-1">
-              {title} Title
+              {title}
             </h3>
             <div className="flex w-full justify-between items-center gap-2">
               <p
                 className="text-sm text-muted-foreground"
                 suppressHydrationWarning
               >
-                {/* {timeAgo(createdAt)} */}
-                Just Now
+                {timeAgo(createdAt)}
               </p>
               {isDelete ? (
                 <AlertDialog

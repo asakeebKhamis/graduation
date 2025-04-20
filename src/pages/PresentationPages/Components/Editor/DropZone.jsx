@@ -18,6 +18,7 @@ const DropZone = ({ index, parentId, slideId }) => {
           parentId,
           index
         );
+        return { handled: true };
       }
     },
     collect: (monitor) => ({
@@ -30,15 +31,13 @@ const DropZone = ({ index, parentId, slideId }) => {
     <div
       ref={drop}
       className={cn(
-        "h-3 w-full transition-all duration-200",
-        isOver && canDrop ? "border-blue-500 bg-blue-100" : "border-gray-300",
-        "hover:border-blue-300"
+        "rounded-md transition-all duration-200",
+        isOver && canDrop ? "border bg-muted/80" : "border-gray-300",
+        canDrop && "h-20 border bg-muted/80"
       )}
     >
       {isOver && canDrop && (
-        <div className="w-full h-full flex text-sm items-center justify-center text-green-600">
-          Drop here
-        </div>
+        <div className="h-full flex items-center justify-center">Drop Here</div>
       )}
     </div>
   );

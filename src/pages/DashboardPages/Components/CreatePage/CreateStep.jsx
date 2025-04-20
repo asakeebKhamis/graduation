@@ -1,95 +1,83 @@
-import React from "react";
-import { CreatePageCard } from "./../../../../utils/constants";
+"use client";
+
 import { motion } from "framer-motion";
-import { containerVariants, itemVariants } from "../../../../utils/motionVariants";
-import { Button } from "../../../../components/ui/button";
-import RecentPrompt from "./RecentPrompt";
-import { useStore } from "../../../../context/StoreContext";
+import {
+  containerVariants,
+  itemVariants,
+} from "../../../../utils/motionVariants";
+import { Card } from "../../../../components/ui/card";
+import { Sparkles, Pencil, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const CreateStep = ({ onSelectOption }) => {
-  const { prompts } = useStore();
+  const navigate = useNavigate();
 
   return (
     <motion.div
+      className="space-y-6 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
     >
       <motion.div variants={itemVariants} className="text-center space-y-2">
         <h1 className="text-4xl font-bold text-primary">
-          How would you like to get started?
+          Create a New Presentation
         </h1>
         <p className="text-muted-foreground">
-          Choose your preferred method to begin
+          Choose how you want to create your presentation
         </p>
       </motion.div>
 
       <motion.div
-        variants={containerVariants}
-        className="grid gap-6 md:grid-cols-3"
+        variants={itemVariants}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        {CreatePageCard.map((option) => (
-          <motion.div
-            key={option.type}
-            variants={itemVariants}
-            whileHover={{
-              scale: 1.05,
-              rotate: 1,
-              transition: { duration: 0.1 },
-            }}
-            className={`
-            ${
-              option.highlight
-                ? "bg-vivid-gradient"
-                : "hover:bg-vivid-gradient border"
-            }
-            rounded-xl p-[1px] transition-all duration-300 ease-in-out
-        `}
-          >
-            <motion.div
-              className="w-full p-4 flex flex-col gap-y-6 items-start bg-white dark:bg-black rounded-xl"
-              whileHover={{
-                scale: 1.02,
-                transition: { duration: 0.1 },
-              }}
-            >
-              <div className="flex flex-col items-start w-full gap-y-3">
-                <div>
-                  <p className="text-primary text-lg font-semibold">
-                    {option.title}
-                  </p>
-                  <p
-                    className={`${
-                      option.highlight ? "text-ufo" : "text-primary"
-                    } text-4xl font-bold`}
-                  >
-                    {option.highlightedText}
-                  </p>
-                </div>
-                <p className="text-muted-foreground text-sm font-normal">
-                  {option.description}
-                </p>
-              </div>
-              <motion.div
-                className="self-end"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  variant={option.highlight ? "default" : "outline"}
-                  className="w-fit rounded-xl font-bold"
-                  size="sm"
-                  onClick={() => onSelectOption(option.type)}
-                >
-                  {option.highlight ? "Generate" : "Continue"}
-                </Button>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        ))}
+        <Card
+          className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
+          onClick={() => onSelectOption("creative-ai")}
+        >
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold">Creative AI</h2>
+            <p className="text-muted-foreground">
+              Let our AI generate a presentation outline based on your prompt
+            </p>
+          </div>
+        </Card>
+
+        <Card
+          className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
+          onClick={() => onSelectOption("create-scratch")}
+        >
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Pencil className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold">From Scratch</h2>
+            <p className="text-muted-foreground">
+              Create your own presentation outline from scratch
+            </p>
+          </div>
+        </Card>
+
+        <Card
+          className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
+          onClick={() => navigate("/project-form")}
+        >
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold">Project Form</h2>
+            <p className="text-muted-foreground">
+              Create a detailed presentation using our comprehensive project
+              form
+            </p>
+          </div>
+        </Card>
       </motion.div>
-      {prompts.length !== 0 && <RecentPrompt />}
     </motion.div>
   );
 };

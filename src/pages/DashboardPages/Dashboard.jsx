@@ -1,9 +1,35 @@
-import { Projector } from "lucide-react";
-import React from "react";
+import { Loader, Projector } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import Projects from "./Components/Dashboard/Projects";
+import { ErrorMessage, presentationAPI } from "../../lib/api";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
-  const allProjects = ["llll"];
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [allProjects, setAllProjects] = useState([]);
+
+  const getProjects = async () => {
+    try {
+      const { data } = await presentationAPI.getAll();
+      setAllProjects(data.data);
+    } catch (error) {
+      toast("Error", { description: ErrorMessage(error) });
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
+
+  useEffect(() => {
+    getProjects();
+  }, []);
+
+  if (loadingProjects)
+    return (
+      <div className="flex items-center justify-center gap-2 font-semibold min-h-[70vh]">
+        <Loader className="animate-spin" /> Loading Projects
+      </div>
+    );
+
   return (
     <div className="w-full flex flex-col gap-6 relative">
       <div className="flex flex-col-reverse items-start w-full gap-6 sm:flex-row sm:justify-between sm:items-center">

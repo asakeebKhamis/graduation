@@ -92,13 +92,11 @@ export default function ThemeCard({
             {content}
           </CardContent>
 
-          <div className="relative w-full md:w-1/2 h-80 md:h-auto overflow-hidden rounded-r-lg">
-            <image
+          <div className="relative w-full md:w-1/2 overflow-hidden rounded-r-lg">
+            <img
               src="https://plus.unsplash.com/premium_photo-1729004379397-ece899804701?q=80&w=2767&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMyA3fDB8MHxwa690by1wYWd1fHx8fGVufDB8fHx8fA%30%3D"
               alt="Theme preview image"
-              layout="fill"
-              objectFit="cover"
-              className="transition-transform duration-500 hover:scale-110"
+              className="transition-transform duration-500 hover:scale-110 object-cover h-full"
             />
           </div>
         </div>

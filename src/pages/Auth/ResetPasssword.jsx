@@ -1,5 +1,5 @@
-import axios from "axios";
-import Cookie from "js-cookie";
+"use client";
+
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,9 +13,10 @@ import {
   InputOTPSlot,
 } from "../../components/ui/input-otp";
 import { useLanguage } from "../../context/LanguageContext";
-import { BaseUrlApi, ErrorMessage } from "../../lib/api";
+import { authAPI, ErrorMessage } from "../../lib/api";
 import { CheckCodeData, ResetPasswordData } from "../../lib/languages";
 import { toast } from "sonner";
+import Cookie from "js-cookie";
 
 export default function ResetPasswordPage() {
   const { language } = useLanguage();
@@ -31,18 +32,17 @@ export default function ResetPasswordPage() {
     try {
       setLoadingCheckCode(true);
       setErrors([]);
-      const { data } = await axios.post(`${BaseUrlApi}/check-code`, {
-        email,
-        reset_code: resetCode,
-      });
+      const { data } = await authAPI.checkResetCode(email, resetCode);
       toast("Code Verified", {
         description: "Your code has been successfully verified.",
       });
       Cookie.set("token", data.token);
+      localStorage.setItem("token", data.token);
       setIsCodeSuccess(true);
     } catch (error) {
       setErrors(ErrorMessage(error));
       Cookie.remove("token");
+      localStorage.removeItem("token");
     } finally {
       setLoadingCheckCode(false);
     }
@@ -56,9 +56,7 @@ export default function ResetPasswordPage() {
       try {
         setLoadingResendCode(true);
         setErrors([]);
-        await axios.post(`${BaseUrlApi}/resend-code`, {
-          email,
-        });
+        await authAPI.resendCode(email);
         toast("Code Resent", {
           description: "A new verification code has been sent to your email.",
         });
@@ -193,7 +191,7 @@ const ResetPassword = () => {
     try {
       setLoading(true);
       setErrors([]);
-      await axios.post(`${BaseUrlApi}/reset-password`, form);
+      await authAPI.resetPassword(form.password, form.password_confirmation);
       toast("Password Reset Success", {
         description:
           "Your password has been reset successfully. You can now log in with your new password. 👏",
@@ -202,6 +200,7 @@ const ResetPassword = () => {
     } catch (error) {
       setErrors(ErrorMessage(error));
       Cookie.remove("token");
+      localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Projects from "../Components/Dashboard/Projects";
 import DeleteAllButton from "./_components/DeleteAllButton";
-import { Projector } from "lucide-react";
+import { Loader, Projector } from "lucide-react";
+import { ErrorMessage, presentationAPI } from "../../../lib/api";
+import { toast } from "sonner";
 
 export default function Trash() {
+  const [loadingTrashs, setLoadingTrashs] = useState(true);
+  const [allTrashs, setAllTrashs] = useState([]);
+
+  const fetchTrash = async () => {
+    try {
+      const { data } = await presentationAPI.getTrash();
+      setAllTrashs(data.data);
+    } catch (error) {
+      toast("Error", { description: ErrorMessage(error) });
+    } finally {
+      setLoadingTrashs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrash();
+  }, []);
+
+  if (loadingTrashs)
+    return (
+      <div className="flex items-center justify-center gap-2 font-semibold min-h-[70vh]">
+        <Loader className="animate-spin" /> Loading Projects
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-6 relative">
       <div className="flex justify-between items-center">
@@ -15,11 +42,11 @@ export default function Trash() {
             All your deleted presentations
           </p>
         </div>
-        <DeleteAllButton Projects={[]} />
+        <DeleteAllButton Projects={allTrashs} />
       </div>
 
-      {[].length > 0 ? (
-        <Projects projects={[]} />
+      {allTrashs.length > 0 ? (
+        <Projects projects={allTrashs} />
       ) : (
         <div className="flex flex-col min-h-[70vh] w-full justify-center items-center gap-8">
           <Projector className="size-32" />

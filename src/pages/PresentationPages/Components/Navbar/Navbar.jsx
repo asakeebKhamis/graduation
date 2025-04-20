@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStore } from "../../../../context/StoreContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "../../../../components/ui/button";
-import { Home, Play, Share } from "lucide-react";
+import {
+  CloudCog,
+  CloudLightningIcon,
+  Home,
+  Loader,
+  Loader2,
+  Play,
+  Share,
+} from "lucide-react";
 import PresentationMode from "./PresentationMode";
+import { Input } from "../../../../components/ui/input";
+import { presentationAPI } from "src/lib/api";
 
 export const Navbar = ({ presentationId }) => {
-  const { currentTheme } = useStore();
+  const { currentTheme, isSaving, project } = useStore();
   const [isPresentationMode, setIsPresentationMode] = useState(false);
+  const [title, setTitle] = useState(project?.title || "Presentation Editor");
 
   const handleCopy = () => {
     navigator.clipboard.writeText(
@@ -18,6 +29,25 @@ export const Navbar = ({ presentationId }) => {
       description: "The link has been copied to your clipboard",
     });
   };
+
+  useEffect(() => {
+    const updatePresentaion = async () => {
+      try {
+        await presentationAPI.update(presentationId, { title });
+      } catch (error) {
+        toast.error("Error", {
+          description: "An unexpected error occurred",
+        });
+      }
+    };
+    const timeOut = setTimeout(() => {
+      updatePresentaion();
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [title]);
 
   return (
     <nav
@@ -39,14 +69,31 @@ export const Navbar = ({ presentationId }) => {
         </Button>
       </Link>
 
-      <Link
-        href="/presentation/template-market"
-        className="text-lg font-semibold hidden sm:block"
-      >
-        Presentation Editor
-      </Link>
+      <Input
+        className="font-semibold hidden sm:block w-fit text-center outline-none border-none text-xl"
+        value={title}
+        placeholder="Presentation Title"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
 
-      <div className="flex items-center gap-4">
+      <div
+        className="flex items-center gap-4"
+        style={{ color: currentTheme.accentColor }}
+      >
+        <div className="flex items-center gap-1">
+          {isSaving ? (
+            <>
+              <Loader2 className="animate-spin w-5 h-5" /> Saving...
+            </>
+          ) : (
+            <>
+              <CloudLightningIcon className="w-5 h-5" /> Saved
+            </>
+          )}
+        </div>
+
         <Button
           variant="outline"
           style={{ backgroundColor: currentTheme.backgroundColor }}

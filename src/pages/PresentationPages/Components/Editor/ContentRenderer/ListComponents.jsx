@@ -1,6 +1,7 @@
+"use client";
+
 import { useStore } from "../../../../../context/StoreContext";
 import { cn } from "../../../../../lib/utils";
-import { Input } from "src/components/ui/input";
 
 const ListItem = ({
   item,
@@ -10,12 +11,12 @@ const ListItem = ({
   isEditable,
   fontColor,
 }) => (
-  <Input
+  <input
     type="text"
     value={item}
     onChange={(e) => onChange(index, e.target.value)}
     onKeyDown={(e) => onKeyDown(e, index)}
-    className="bg-transparent outline-none w-full py-1"
+    className="bg-transparent outline-none py-1"
     style={{ color: fontColor }}
     readOnly={!isEditable}
   />
@@ -133,27 +134,49 @@ const BulletList = ({ items, onChange, className, isEditable = true }) => {
   );
 };
 
-// TodoList component
+// Fixed TodoList component
 const TodoList = ({ items, onChange, className, isEditable = true }) => {
   const { currentTheme } = useStore();
 
+  // Ensure items are in the correct format
+  const normalizeItems = (items) => {
+    if (!Array.isArray(items)) return [{ text: "", checked: false }];
+
+    return items.map((item) => {
+      if (typeof item === "string") {
+        // Convert string format to object format
+        return {
+          text: item.replace(/^\[[ x]\] /, ""),
+          checked: item.startsWith("[x] "),
+        };
+      }
+      // Already in object format or invalid format
+      return item && typeof item === "object"
+        ? item
+        : { text: "", checked: false };
+    });
+  };
+
+  const normalizedItems = normalizeItems(items);
+
   const toggleCheckbox = (index) => {
     if (isEditable) {
-      const newItems = [...items];
-      newItems[index] = newItems[index].startsWith("[x] ")
-        ? newItems[index].replace("[x] ", "[ ] ")
-        : newItems[index].replace("[ ] ", "[x] ");
+      const newItems = [...normalizedItems];
+      newItems[index] = {
+        ...newItems[index],
+        checked: !newItems[index].checked,
+      };
       onChange(newItems);
     }
   };
 
   const handleChange = (index, value) => {
     if (isEditable) {
-      const newItems = [...items];
-      newItems[index] =
-        value.startsWith("[ ] ") || value.startsWith("[x] ")
-          ? value
-          : `[ ] ${value}`;
+      const newItems = [...normalizedItems];
+      newItems[index] = {
+        ...newItems[index],
+        text: value,
+      };
       onChange(newItems);
     }
   };
@@ -161,8 +184,8 @@ const TodoList = ({ items, onChange, className, isEditable = true }) => {
   const handleKeyDown = (e, index) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const newItems = [...items];
-      newItems.splice(index + 1, 0, "[ ] ");
+      const newItems = [...normalizedItems];
+      newItems.splice(index + 1, 0, { text: "", checked: false });
       onChange(newItems);
       setTimeout(() => {
         const nextInput = document.querySelector(
@@ -172,11 +195,11 @@ const TodoList = ({ items, onChange, className, isEditable = true }) => {
       }, 0);
     } else if (
       e.key === "Backspace" &&
-      items[index].replace(/^\[[ x]\] /, "") === "" &&
-      items.length > 1
+      normalizedItems[index].text === "" &&
+      normalizedItems.length > 1
     ) {
       e.preventDefault();
-      const newItems = [...items];
+      const newItems = [...normalizedItems];
       newItems.splice(index, 1);
       onChange(newItems);
     }
@@ -187,27 +210,23 @@ const TodoList = ({ items, onChange, className, isEditable = true }) => {
       className={cn("space-y-1", className)}
       style={{ color: currentTheme.fontColor }}
     >
-      {items.map((item, index) => (
+      {normalizedItems.map((item, index) => (
         <li key={index} className="flex items-center gap-2">
           <input
             type="checkbox"
-            checked={item.startsWith("[x] ")}
+            checked={item.checked}
             onChange={() => toggleCheckbox(index)}
             className="form-checkbox"
             disabled={!isEditable}
           />
-          <ListItem
-            item={item.replace(/^\[[ x]\] /, "")}
-            index={index}
-            onChange={(index, value) =>
-              handleChange(
-                index,
-                `${item.startsWith("[x] ") ? "[x] " : "[ ] "}${value}`
-              )
-            }
-            onKeyDown={handleKeyDown}
-            isEditable={isEditable}
-            fontColor={currentTheme.fontColor}
+          <input
+            type="text"
+            value={item.text || ""}
+            onChange={(e) => handleChange(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            className="bg-transparent outline-none w-full py-1"
+            style={{ color: currentTheme.fontColor }}
+            readOnly={!isEditable}
           />
         </li>
       ))}

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   containerVariants,
@@ -20,6 +22,7 @@ import RecentPrompt from "./RecentPrompt";
 import { toast } from "sonner";
 import { generateCreativePrompt } from "../../../../utils/CreativeAi";
 import { useNavigate } from "react-router-dom";
+import { presentationAPI, aiAPI, ErrorMessage } from "../../../../lib/api";
 
 export default function CreativeAIStep({ onBack }) {
   const navigate = useNavigate();
@@ -100,67 +103,55 @@ export default function CreativeAIStep({ onBack }) {
     }
 
     try {
-      // const res = await createProject(
-      //   currentAiPrompt,
-      //   outlinesCreativeAi.slice(0, noOfCards)
+      const res = await presentationAPI.create({
+        title:
+          currentAiPrompt ||
+          outlinesCreativeAi?.[0]?.title ||
+          "Untitled Presentation",
+        themeName: "Default",
+      });
+
+      if (res.status !== 201) {
+        throw new Error(res.data?.error || "Failed to create project");
+      }
+
+      const projectId = res.data.data._id;
+
+      // Generate layouts
+      // const layoutsRes = await aiAPI.generateLayouts(
+      //   projectId,
+      //   outlinesCreativeAi.slice(0, noOfCards),
+      //   "Default"
       // );
 
-      const res = await new Promise((resolve) =>
-        setTimeout(() => {
-          resolve("Create Project");
-        }, 3000)
-      );
+      // if (layoutsRes.status !== 200) {
+      //   throw new Error(layoutsRes.data?.error || "Failed to generate layouts");
+      // }
 
-      navigate(
-        `/presentation/${Math.random().toString(36).substring(2)}/select-theme`
-      );
-      setPrompts({
-        id: Math.random().toString(36).substring(2),
-        title: currentAiPrompt || outlinesCreativeAi?.[0]?.title,
-        outlines: outlinesCreativeAi,
-        createdAt: new Date().toISOString(),
-      });
+      // // Update slides
+      // await presentationAPI.updateSlides(projectId, layoutsRes.data.data);
+
+      // // Save prompt
+      // await aiAPI.savePrompt({
+      //   title:
+      //     currentAiPrompt ||
+      //     outlinesCreativeAi?.[0]?.title ||
+      //     "Untitled Prompt",
+      //   outlines: outlinesCreativeAi.slice(0, noOfCards),
+      // });
 
       toast.success("Success", {
         description: "Project created successfully!",
       });
 
+      navigate(`/presentation/${projectId}/select-theme`);
+
       setCurrentAiPrompt("");
       resetOutlinesCreativeAi();
-
-      // if (res.status !== 200) {
-      //   toast.error("Error", {
-      //     description: res.error || "Failed to create project",
-      //   });
-      //   return;
-      // }
-
-      // if (res.data) {
-      //   navigate(`/presentation/${res.data.id}/select-theme`);
-      //   // srtProject(res.data);
-
-      //   setPrompts({
-      //     id: Math.random().toString(36).substring(2),
-      //     title: currentAiPrompt || outlinesCreativeAi?.[0]?.title,
-      //     outlines: outlinesCreativeAi,
-      //     createdAt: new Date().toISOString(),
-      //   });
-
-      //   toast.success("Success", {
-      //     description: "Project created successfully!",
-      //   });
-
-      //   setCurrentAiPrompt("");
-      //   resetOutlinesCreativeAi();
-      // } else {
-      //   toast.error("Error", {
-      //     description: "Failed to create project.",
-      //   });
-      // }
     } catch (error) {
       console.error("Error creating project:", error);
       toast.error("Error", {
-        description: "An unexpected error occurred",
+        description: ErrorMessage(error) || "An unexpected error occurred",
       });
     } finally {
       setIsGenerating(false);
@@ -202,7 +193,7 @@ export default function CreativeAIStep({ onBack }) {
         <div className="flex items-center gap-3">
           <Select
             value={noOfCards.toString()}
-            onValueChange={(value) => setNoOfCards(parseInt(value))}
+            onValueChange={(value) => setNoOfCards(Number.parseInt(value))}
           >
             <SelectTrigger className="w-fit gap-2 font-semibold shadow-xl">
               <SelectValue placeholder="Select number of cards" />

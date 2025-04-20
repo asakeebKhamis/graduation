@@ -5,6 +5,7 @@ const createHeading = (displayName, defaultClassName) => {
   const Heading = React.forwardRef(
     ({ children, styles, isPreview = false, className, ...props }, ref) => {
       const textareaRef = useRef(null);
+
       useEffect(() => {
         const textarea = textareaRef.current;
         if (textarea && !isPreview) {
@@ -17,7 +18,8 @@ const createHeading = (displayName, defaultClassName) => {
           return () => textarea.removeEventListener("input", adjustHeight);
         }
       }, [isPreview]);
-      const previewClassName = isPreview ? "text-xs" : "";
+
+      const previewClassName = isPreview ? "text-lg" : "";
 
       return (
         <textarea
@@ -38,11 +40,8 @@ const createHeading = (displayName, defaultClassName) => {
           }}
           ref={(el) => {
             textareaRef.current = el;
-            if (typeof ref === "function") {
-              ref(el);
-            } else if (ref) {
-              ref.current = el;
-            }
+            if (typeof ref === "function") ref(el);
+            else if (ref) ref.current = el;
           }}
           readOnly={isPreview}
           {...props}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AppSidebar } from "../../components/appSidebar";
+import { AppSidebar } from "../../components/Sidebar/appSidebar";
 import { SidebarProvider, SidebarTrigger } from "../../components/ui/sidebar";
 import { useLanguage } from "../../context/LanguageContext";
 import SelectLanguage from "../../components/SelectLanguage";
@@ -28,7 +28,7 @@ export default function DashboardLayout() {
 const Header = () => {
   const { language } = useLanguage();
   const navigate = useNavigate();
-  
+
   return (
     <div
       className="px-5 h-14 flex items-center gap-2 justify-between border-b"

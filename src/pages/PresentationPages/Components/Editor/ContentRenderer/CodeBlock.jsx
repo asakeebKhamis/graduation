@@ -14,17 +14,17 @@ const CodeBlock = ({
     <pre
       className={cn("p-4 rounded-lg overflow-x-auto", className)}
       style={{
-        backgroundColor: `${currentTheme.accentColor}20`,
+        backgroundColor: currentTheme.accentColor + "20",  
       }}
     >
       <code className={`language-${language}`}>
         <textarea
           value={code}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-full bg-transparent outline-none font-mono whitespace-pre"
+          className="w-full h-full bg-transparent outline-none font-mono"
           style={{ color: currentTheme.fontColor }}
-          readOnly={!isEditable}
-          spellCheck="false"
+          // readOnly={!isEditable}
+          // spellCheck="false"
         />
       </code>
     </pre>

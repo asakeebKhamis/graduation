@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../context/StoreContext";
 import { useTheme } from "next-themes";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 import { DndProvider } from "react-dnd";
 import { useParams } from "react-router-dom";
 import LayoutPreview from "./Components/LeftSidebar/LayoutPreview";
@@ -10,50 +10,55 @@ import { toast } from "sonner";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import EditorSidebar from "./Components/RightSidebar/EditorSidebar";
 import { Navbar } from "./Components/Navbar/Navbar";
+import { themes } from "../../utils/constants";
+import { presentationAPI } from "../../lib/api";
 
-export default function Presentation() {
+export default function Presentation({ isEditable = true }) {
   const { id: presentationId } = useParams();
 
-  const { setSlides, project, setProject, currentTheme, setCurrentTheme } =
-    useStore();
-  const { setTheme } = useTheme();
-  const [isLoading, setIsLoading] = useState(false);
+  const { currentTheme, setCurrentTheme, setSlides, setProject } = useStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect(() => {
-  //   async (params) => {
-  //     try {
-  //       // const res = await getProjectById(params.presentationId);
-  //       const res = await new Promise((resolve) => setTimeout(() => {}, 3000));
+  useEffect(() => {
+    const GetPresentaion = async () => {
+      try {
+        const { data } = await presentationAPI.getById(presentationId);
+        setSlides(data.data.slides);
+        setProject(data.data);
+        setCurrentTheme(
+          themes.find((theme) => theme.name === data.data.themeName)
+        );
+      } catch (error) {
+        toast.error("Error", {
+          description: "An unexpected error occurred",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    GetPresentaion();
+  }, [presentationId]);
 
-  //       if (res.status !== 200 || !res.data) {
-  //         toast.error("Error", {
-  //           description: "Unable to fetch project",
-  //         });
-  //         // redirect("/dashboard");
-  //         return;
-  //       }
-
-  //       const findTheme = themes.find(
-  //         (theme) => theme.name === res.data.themeName
-  //       );
-  //       setCurrentTheme(findTheme || themes[0]);
-  //       setTheme(findTheme?.type === "dark" ? "dark" : "light");
-  //       // setProject(res.data);
-  //       setSlides(JSON.parse(JSON.stringify(res.data.slides)));
-  //     } catch (error) {
-  //       toast.error("Error", {
-  //         description: "An unexpected error occurred",
-  //       });
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-  // }, []);
+  useEffect(() => {
+    const updateThemes = async () => {
+      try {
+        await presentationAPI.updateTheme(presentationId, currentTheme.name);
+      } catch (error) {
+        toast.error("Error", {
+          description: "An unexpected error occurred",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    updateThemes();
+  }, [currentTheme.name]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col gap-2 items-center justify-center h-screen">
+        <Loader className="w-8 h-8 animate-spin text-primary" /> Get All
+        Slides...
       </div>
     );
   }
@@ -72,7 +77,7 @@ export default function Presentation() {
         >
           <LayoutPreview />
           <div className="flex-1 ml-64 pr-16">
-            <Editor isEditable={true} />
+            <Editor isEditable={isEditable} />
           </div>
           <EditorSidebar />
         </div>

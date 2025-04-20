@@ -1,7 +1,8 @@
+"use client";
+
 import { useState } from "react";
 import Cookie from "js-cookie";
-import axios from "axios";
-import { BaseUrlApi, ErrorMessage } from "../../lib/api";
+import { authAPI, ErrorMessage } from "../../lib/api";
 import { useLanguage } from "../../context/LanguageContext";
 import { LoginData } from "../../lib/languages";
 import { Loader2, LucideOrigami } from "lucide-react";
@@ -30,8 +31,9 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setErrors({});
-      const { data } = await axios.post(`${BaseUrlApi}/login`, form);
+      const { data } = await authAPI.login(form);
       Cookie.set("token", data.token);
+      localStorage.setItem("token", data.token);
       toast("Login Success", {
         description: "You are now logged in, Enjoy 👋",
       });
@@ -42,6 +44,7 @@ export default function LoginPage() {
       });
       setErrors(ErrorMessage(error));
       Cookie.remove("token");
+      localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }
@@ -54,7 +57,7 @@ export default function LoginPage() {
     try {
       setLoadingGoogle(true);
       setErrors({});
-      const { data } = await axios.get(`${BaseUrlApi}/auth/google`);
+      const { data } = await authAPI.getGoogleAuthUrl();
       window.location.href = data.url;
     } catch (error) {
       setErrors(ErrorMessage(error));
