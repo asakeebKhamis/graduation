@@ -136,6 +136,15 @@ export const presentationAPI = {
     }
   },
 
+  getShared: async () => {
+    try {
+      const response = await api.get("/presentations/shared");
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getById: async (id) => {
     try {
       const response = await api.get(`/presentations/${id}`);
@@ -186,6 +195,15 @@ export const presentationAPI = {
   delete: async (id) => {
     try {
       const response = await api.delete(`/presentations/${id}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  shared: async (id) => {
+    try {
+      const response = await api.put(`/presentations/${id}/shared`);
       return response;
     } catch (error) {
       throw error;

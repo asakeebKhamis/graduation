@@ -12,6 +12,8 @@ import SelectTheme from "./pages/PresentationPages/SelectTheme";
 import Presentation from "./pages/PresentationPages/Presentation";
 import Trash from "./pages/DashboardPages/Trash/Trash";
 import ProjectForm from "./pages/PresentationPages/project-form";
+import Shared from "./pages/DashboardPages/Shared/Shared";
+import { Pricing } from "./components/common/Pricing";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/create-page" element={<CreatePage />} />
           <Route path="/trash" element={<Trash />} />
+          <Route path="/shared" element={<Shared />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/project-form" element={<ProjectForm />} />
         </Route>
         <Route

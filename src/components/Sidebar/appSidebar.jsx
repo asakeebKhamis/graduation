@@ -23,7 +23,7 @@ import {
   User2,
   Users2,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -93,7 +93,8 @@ export function AppSidebar() {
   const { language } = useLanguage();
   const t = SidebarData[language] || SidebarData["en"];
   const { open } = useSidebar();
-
+  const navigate = useNavigate();
+  
   return (
     <Sidebar
       variant={"floating"}
@@ -151,7 +152,10 @@ export function AppSidebar() {
               Unlock all features including AI and More
             </p>
             <div className="p-px rounded-full bg-gradient-to-b from-amber-500 to-amber-700">
-              <Button className="rounded-full w-full bg-background text-primary hover:bg-accent h-10">
+              <Button
+                className="rounded-full w-full bg-background text-primary hover:bg-accent h-10"
+                onClick={() => navigate("pricing")}
+              >
                 Upgrade
               </Button>
             </div>

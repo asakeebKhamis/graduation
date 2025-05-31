@@ -40,6 +40,7 @@ export default function Presentation({ isEditable = true }) {
   }, [presentationId]);
 
   useEffect(() => {
+    if (!isEditable) return;
     const updateThemes = async () => {
       try {
         await presentationAPI.updateTheme(presentationId, currentTheme.name);
@@ -66,7 +67,7 @@ export default function Presentation({ isEditable = true }) {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen flex flex-col">
-        <Navbar presentationId={presentationId} />
+        <Navbar presentationId={presentationId} isEditable={isEditable} />
         <div
           className="flex-1 flex overflow-hidden pt-16"
           style={{

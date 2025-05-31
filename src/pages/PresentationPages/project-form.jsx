@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import FormComplete from "./form-steps/FormComplete";
 import { presentationAPI } from "../../lib/api";
+import FormEditAi from "./form-components/FormEditAi";
 
 const steps = [
   { id: "project-info", title: "معلومات عن المشروع" },
@@ -169,7 +170,7 @@ export default function ProjectForm() {
   };
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
@@ -187,282 +188,531 @@ export default function ProjectForm() {
     setIsGenerating(true);
 
     try {
-      const prompt = `
-      > You now have full access to all available business data retrieved, which includes detailed information about the brand, products, services, target audiences, marketing goals, pricing, targeting locations, and competitors. Additionally, you have the following custom information:
+//       const prompt = `
+//       > You now have full access to all available business data retrieved, which includes detailed information about the brand, products, services, target audiences, marketing goals, pricing, targeting locations, and competitors. Additionally, you have the following custom information:
 
-> Project Name: ${formData.projectName}  
-> Business Field: ${formData.businessField}  
-> Project Description: ${formData.projectDescription}  
-> Vision & Mission: ${formData.visionMission}  
-> Target Audience: ${formData.targetAudience}  
-> Interests & Behaviors: ${formData.interestsBehaviors}  
-> Demographic Goals: ${formData.demographicGoals}  
-> Primary Marketing Goal: ${formData.primaryGoal}  
-> Short & Long Term Goals: ${formData.shortLongTermGoals}  
-> Priorities: ${formData.priorities}  
-> Digital Presence: ${formData.digitalPresence}  
-> Previous Marketing: ${formData.previousMarketing}  
-> Strengths & Weaknesses: ${formData.strengthsWeaknesses}  
-> Competitive Advantages: ${formData.competitiveAdvantages}  
-> Unique Technology: ${formData.uniqueTechnology}  
-> Brand Voice Direction: ${formData.generalDirection}  
-> Brand Tonality: ${formData.tonality}  
-> Marketing Budget: ${formData.financialAllocation}  
-> Budget Priorities: ${formData.budgetPriorities}  
-> Marketing Channels: ${formData.channelSelection}  
-> Most Effective Channels: ${formData.mostEffectiveChannels}  
-> Main Competitors: ${formData.mainCompetitors}  
-> Competitor Strategies: ${formData.competitorStrategies}  
-> Timeframe: ${formData.timeframe}  
-> Seasonal Periods: ${formData.seasonalPeriods}  
-> Additional Information:
-> - Product Advantages: ${formData.productAdvantages}
-> - Upcoming Products: ${formData.upcomingProducts}
-> - Preferred Campaigns: ${formData.preferredCampaigns}
-> - Customer Relationship: ${formData.customerRelationship}
-> - Content Preferences: ${formData.contentPreferences}
-> - Audience Interactions: ${formData.audienceInteractions}
-> - Targeting Strategy: ${formData.targetingStrategy}
-> - Audience Interests Outside: ${formData.audienceInterestsOutside}
-> - Measurement Preferences: ${formData.measurementPreferences}
-> - Report Preferences: ${formData.reportPreferences}
-> - Previous Challenges: ${formData.previousChallenges}
-> - Expansion Concerns: ${formData.expansionConcerns}
-> - Customer Support: ${formData.customerSupport}
-> - Customer Experience: ${formData.customerExperience}
-> - Design Preferences: ${formData.designPreferences}
-> - Photography Style: ${formData.photographyStyle}
-> - Peak Periods: ${formData.peakPeriods}
-> - Specific Timeframes: ${formData.specificTimeframes}
-> - Five Year Vision: ${formData.fiveYearVision}
-> - Expansion Plans: ${formData.expansionPlans}
->
-> **Your task is to:**  
-> Carefully analyze all the provided data, deeply understand the brand and its ecosystem, then develop a complete, professional marketing plan that includes:
->
-> 1. **Current Situation Analysis**  
-> 2. **Define the Ideal Target Audience** (Create Buyer Personas + Segments)  
-> 3. **Set SMART Marketing Goals** (Specific, Measurable, Achievable, Relevant, Time-bound)  
-> 4. **Content Strategy**, including:
->    - Content Pillars
->    - Post Ideas and Ad Ideas  
-> 5. **Advertising Campaign Strategy**, covering:
->    - Budget Allocation
->    - Targeting (demographic, behavioral, interests)
->    - Platforms Selection (e.g., Facebook, Instagram, TikTok, Google Ads)  
-> 6. **Full Marketing Channels Plan**:
->    - Social Media Channels
->    - Offline Marketing Opportunities
->    - Influencer Collaborations
->    - Potential Partnerships
-> 7. **Clear KPIs** for measuring each goal and tracking performance  
-> 8. **Solutions and Recommendations**:
->    - Address any detected challenges or weaknesses
->    - Provide proactive solutions and additional suggestions from your expertise to maximize success
->
-> ✅ Make the marketing plan detailed, practical, and ready for real-world execution, with examples and action steps wherever possible.
+// > Project Name: ${formData.projectName}  
+// > Business Field: ${formData.businessField}  
+// > Project Description: ${formData.projectDescription}  
+// > Vision & Mission: ${formData.visionMission}  
+// > Target Audience: ${formData.targetAudience}  
+// > Interests & Behaviors: ${formData.interestsBehaviors}  
+// > Demographic Goals: ${formData.demographicGoals}  
+// > Primary Marketing Goal: ${formData.primaryGoal}  
+// > Short & Long Term Goals: ${formData.shortLongTermGoals}  
+// > Priorities: ${formData.priorities}  
+// > Digital Presence: ${formData.digitalPresence}  
+// > Previous Marketing: ${formData.previousMarketing}  
+// > Strengths & Weaknesses: ${formData.strengthsWeaknesses}  
+// > Competitive Advantages: ${formData.competitiveAdvantages}  
+// > Unique Technology: ${formData.uniqueTechnology}  
+// > Brand Voice Direction: ${formData.generalDirection}  
+// > Brand Tonality: ${formData.tonality}  
+// > Marketing Budget: ${formData.financialAllocation}  
+// > Budget Priorities: ${formData.budgetPriorities}  
+// > Marketing Channels: ${formData.channelSelection}  
+// > Most Effective Channels: ${formData.mostEffectiveChannels}  
+// > Main Competitors: ${formData.mainCompetitors}  
+// > Competitor Strategies: ${formData.competitorStrategies}  
+// > Timeframe: ${formData.timeframe}  
+// > Seasonal Periods: ${formData.seasonalPeriods}  
+// > Additional Information:
+// > - Product Advantages: ${formData.productAdvantages}
+// > - Upcoming Products: ${formData.upcomingProducts}
+// > - Preferred Campaigns: ${formData.preferredCampaigns}
+// > - Customer Relationship: ${formData.customerRelationship}
+// > - Content Preferences: ${formData.contentPreferences}
+// > - Audience Interactions: ${formData.audienceInteractions}
+// > - Targeting Strategy: ${formData.targetingStrategy}
+// > - Audience Interests Outside: ${formData.audienceInterestsOutside}
+// > - Measurement Preferences: ${formData.measurementPreferences}
+// > - Report Preferences: ${formData.reportPreferences}
+// > - Previous Challenges: ${formData.previousChallenges}
+// > - Expansion Concerns: ${formData.expansionConcerns}
+// > - Customer Support: ${formData.customerSupport}
+// > - Customer Experience: ${formData.customerExperience}
+// > - Design Preferences: ${formData.designPreferences}
+// > - Photography Style: ${formData.photographyStyle}
+// > - Peak Periods: ${formData.peakPeriods}
+// > - Specific Timeframes: ${formData.specificTimeframes}
+// > - Five Year Vision: ${formData.fiveYearVision}
+// > - Expansion Plans: ${formData.expansionPlans}
+// >
+// > **Your task is to:**  
+// > Carefully analyze all the provided data, deeply understand the brand and its ecosystem, then develop a complete, professional marketing plan that includes:
+// >
+// > 1. **Current Situation Analysis**  
+// > 2. **Define the Ideal Target Audience** (Create Buyer Personas + Segments)  
+// > 3. **Set SMART Marketing Goals** (Specific, Measurable, Achievable, Relevant, Time-bound)  
+// > 4. **Content Strategy**, including:
+// >    - Content Pillars
+// >    - Post Ideas and Ad Ideas  
+// > 5. **Advertising Campaign Strategy**, covering:
+// >    - Budget Allocation
+// >    - Targeting (demographic, behavioral, interests)
+// >    - Platforms Selection (e.g., Facebook, Instagram, TikTok, Google Ads)  
+// > 6. **Full Marketing Channels Plan**:
+// >    - Social Media Channels
+// >    - Offline Marketing Opportunities
+// >    - Influencer Collaborations
+// >    - Potential Partnerships
+// > 7. **Clear KPIs** for measuring each goal and tracking performance  
+// > 8. **Solutions and Recommendations**:
+// >    - Address any detected challenges or weaknesses
+// >    - Provide proactive solutions and additional suggestions from your expertise to maximize success
+// >
+// > ✅ Make the marketing plan detailed, practical, and ready for real-world execution, with examples and action steps wherever possible.
+
+// ${JSON.stringify([
+//   {
+//     slideName: "Blank card",
+//     type: "blank-card",
+//     className: "p-8 mx-auto flex justify-center items-center min-h-[200px]",
+//     content: {
+//       id: "7qnukx3rk9o",
+//       type: "column",
+//       name: "Column",
+//       content: [
+//         {
+//           id: "wn5yynls75",
+//           type: "title",
+//           name: "Title",
+//           content: "",
+//           placeholder: "Untitled Card",
+//         },
+//         {
+//           id: "ejkhcvjwgft",
+//           type: "paragraph",
+//           name: "Paragraph",
+//           content: "",
+//           placeholder: "Start typing...",
+//         },
+//       ],
+//     },
+//     id: "jxnaaw0y9lh",
+//     slideOrder: 0,
+//     elements: [],
+//   },
+//   {
+//     slideName: "Blank card",
+//     type: "blank-card",
+//     className: "p-8 mx-auto flex justify-center items-center min-h-[200px]",
+//     content: {
+//       id: "7qnukx3rk9o",
+//       type: "column",
+//       name: "Column",
+//       content: [
+//         {
+//           id: "wn5yynls75",
+//           type: "title",
+//           name: "Title",
+//           content: "",
+//           placeholder: "Untitled Card",
+//         },
+//         {
+//           id: "loj4jol7x9",
+//           type: "bulletList",
+//           name: "Bullet List",
+//           content: ["First item", "Second item", "Third item", "Four item"],
+//         },
+//         {
+//           id: "uwy6sroraa",
+//           type: "tableOfContents",
+//           name: "Table of Contents",
+//           content: ["Section 1", "Section 2", "Section 3"],
+//         },
+//       ],
+//     },
+//     id: "8hk50l5vjp3",
+//     slideOrder: 1,
+//     elements: [],
+//   },
+//   {
+//     slideName: "Blank card",
+//     type: "blank-card",
+//     className: "p-8 mx-auto flex justify-center items-center min-h-[200px]",
+//     content: {
+//       id: "7qnukx3rk9o",
+//       type: "column",
+//       name: "Column",
+//       content: [
+//         {
+//           id: "wn5yynls75",
+//           type: "title",
+//           name: "Title",
+//           content: "",
+//           placeholder: "Untitled Card",
+//         },
+//         {
+//           id: "dxzu7ggiudi",
+//           type: "table",
+//           name: "Table",
+//           initialRows: 4,
+//           initialColumns: 4,
+//           content: [],
+//         },
+//       ],
+//     },
+//     id: "lm1ljf2x9wo",
+//     slideOrder: 2,
+//   },
+//   {
+//     slideName: "Three columns with headings",
+//     type: "threeColumnsWithHeadings",
+//     className: "p-4 mx-auto flex justify-center items-center",
+//     content: {
+//       id: "68mmx72qc89",
+//       type: "column",
+//       name: "Column",
+//       content: [
+//         {
+//           id: "lhs8udqfdj",
+//           type: "title",
+//           name: "Title",
+//           content: "",
+//           placeholder: "Untitled Card",
+//         },
+//         {
+//           id: "dlzhak2tj",
+//           type: "calloutBox",
+//           name: "Callout Box",
+//           content: "This is a callout box",
+//         },
+//         {
+//           id: "c485istie6t",
+//           type: "divider",
+//           name: "Divider",
+//           content: "",
+//         },
+//         {
+//           id: "9v68k15rv8",
+//           type: "resizable-column",
+//           name: "Columns",
+//           className: "border",
+//           content: [
+//             {
+//               id: "9ul816wcojl",
+//               type: "column",
+//               name: "Column 1",
+//               content: [
+//                 {
+//                   id: "jmdeu0rh3c",
+//                   type: "heading3",
+//                   name: "Heading",
+//                   content: "",
+//                   placeholder: "Heading",
+//                 },
+//                 {
+//                   id: "ckpmnp0o83n",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//                 {
+//                   id: "8tkmgw2z12q",
+//                   type: "numberedList",
+//                   name: "Numbered List",
+//                   content: ["First item", "Second item", "Third item"],
+//                 },
+//               ],
+//             },
+//             {
+//               id: "tg70ipgmsg",
+//               type: "column",
+//               name: "Column 2",
+//               content: [
+//                 {
+//                   id: "8m4ogtsie8a",
+//                   type: "heading3",
+//                   name: "Heading",
+//                   content: "",
+//                   placeholder: "Heading",
+//                 },
+//                 {
+//                   id: "zoz4hzd2e2h",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//                 {
+//                   id: "mwt268aj89",
+//                   type: "todolist",
+//                   name: "Todo List",
+//                   content: [
+//                     {
+//                       text: "Task 1",
+//                       checked: false,
+//                     },
+//                     {
+//                       text: "Task 2",
+//                       checked: false,
+//                     },
+//                     {
+//                       text: "Task 3",
+//                       checked: false,
+//                     },
+//                   ],
+//                 },
+//               ],
+//             },
+//             {
+//               id: "end8ste7lor",
+//               type: "column",
+//               name: "Column 3",
+//               content: [
+//                 {
+//                   id: "gcbv5k7ue3p",
+//                   type: "heading3",
+//                   name: "Heading",
+//                   content: "",
+//                   placeholder: "Heading",
+//                 },
+//                 {
+//                   id: "3dfg3swiciq",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//                 {
+//                   id: "mck5nenzwnc",
+//                   type: "bulletList",
+//                   name: "Bullet List",
+//                   content: ["First item", "Second item", "Third item"],
+//                 },
+//               ],
+//             },
+//           ],
+//         },
+//         {
+//           id: "828cup9xxkh",
+//           type: "divider",
+//           name: "Divider",
+//           content: "",
+//         },
+//       ],
+//     },
+//     id: "c1x829deqho",
+//     slideOrder: 3,
+//   },
+//   {
+//     slideName: "Accent left",
+//     type: "accentLeft",
+//     className: "min-h-[300px]",
+//     content: {
+//       id: "9955jdwit1h",
+//       type: "column",
+//       name: "Column",
+//       restrictDropTo: true,
+//       content: [
+//         {
+//           id: "gisvuu7rspj",
+//           type: "resizable-column",
+//           name: "Resizable column",
+//           restrictToDrop: true,
+//           content: [
+//             {
+//               id: "4s6mi57d167",
+//               type: "column",
+//               name: "Content",
+//               content: [
+//                 {
+//                   id: "b5en5zvvy17",
+//                   type: "heading3",
+//                   name: "Heading",
+//                   content: "",
+//                   placeholder: "Heading",
+//                 },
+//                 {
+//                   id: "lbk25md4meo",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//                 {
+//                   id: "8ae380i7qe8",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//                 {
+//                   id: "6ctt9xtw7u8",
+//                   type: "resizable-column",
+//                   name: "Text and Image",
+//                   className: "border",
+//                   content: [
+//                     {
+//                       id: "lmql4tsyne",
+//                       type: "column",
+//                       name: "Column",
+//                       content: [
+//                         {
+//                           id: "f7tzdhmx1ot",
+//                           type: "paragraph",
+//                           name: "Paragraph",
+//                           content: "",
+//                           placeholder: "Start typing...",
+//                         },
+//                       ],
+//                     },
+//                     {
+//                       id: "cgooe3mck7i",
+//                       type: "column",
+//                       name: "Column",
+//                       content: [
+//                         {
+//                           id: "6e1q35s3sd",
+//                           type: "paragraph",
+//                           name: "Paragraph",
+//                           content: "",
+//                           placeholder: "Start typing...",
+//                         },
+//                       ],
+//                     },
+//                   ],
+//                 },
+//                 {
+//                   id: "qxan6fpy76",
+//                   type: "heading2",
+//                   name: "Heading 2",
+//                   content: "",
+//                   placeholder: "Heading 2",
+//                 },
+//                 {
+//                   id: "vmvo0sxomx",
+//                   type: "paragraph",
+//                   name: "Paragraph",
+//                   content: "",
+//                   placeholder: "Start typing...",
+//                 },
+//               ],
+//             },
+//           ],
+//         },
+//       ],
+//     },
+//     id: "vwm3qhmdnw",
+//     slideOrder: 4,
+//   },
+// ])}
+
+// do the same strucure code i send it to you do not add any strucure from ur self use the code only and return only json using this strucure of slides return like this slides 15 slide and do not return with slide any hints or description only JSON and do not return any additional text with the response.`;
+
+
+      const prompt = `You are a slide‑deck JSON generator.  
+Generate exactly a JSON array of 15 slides, no extra text.
+
+Below is the business data as a JavaScript object. Use its values verbatim when filling slide content.
+
+  projectName: "EduBoost",
+  businessField: "EdTech (Educational Technology)",
+  projectDescription: "EduBoost is a smart academic advising platform designed to help university students plan and register for courses efficiently using AI-driven guidance.",
+  visionMission: "To empower students through technology-driven academic planning tools that enhance success and reduce registration friction.",
+  targetAudience: "University students aged 18–25",
+  interestsBehaviors: "Tech-savvy, goal-oriented, time-conscious, prefers digital solutions",
+  demographicGoals: "Focus on undergraduate students in information systems, engineering, and computer science departments",
+  primaryGoal: "Increase platform sign-ups and user engagement during course registration periods",
+  shortLongTermGoals: "Short-term: Reach 10,000 users in first year. Long-term: Partner with 15+ universities across MENA region",
+  priorities: "Brand awareness, user acquisition, partnership with universities",
+  digitalPresence: "Basic landing page and social media pages on Instagram and LinkedIn",
+  previousMarketing: "Limited to word-of-mouth and university WhatsApp groups",
+  strengthsWeaknesses: "Strengths: Unique value proposition and user-centric design. Weaknesses: Low brand recognition and limited initial budget",
+  competitiveAdvantages: "AI-powered academic planning, integration with student handbooks, visual course paths",
+  uniqueTechnology: "Custom-built recommendation engine using prerequisite and GPA mapping logic",
+  generalDirection: "Friendly, supportive, and student-first",
+  tonality: "Encouraging, knowledgeable, slightly informal but professional",
+  financialAllocation: "Initial seed budget of $20,000 allocated across development, marketing, and hosting",
+  budgetPriorities: "Digital advertising, influencer partnerships, campus ambassador program",
+  channelSelection: "Instagram, YouTube, email newsletters, university events",
+  mostEffectiveChannels: "Instagram Reels, peer-to-peer referrals, targeted Google Ads",
+  mainCompetitors: "Cialfo, Unibuddy, traditional academic advisors",
+  competitorStrategies: "Content marketing, partnerships with schools, webinars and guides",
+  timeframe: "Soft launch in August 2025, full launch in September 2025",
+  seasonalPeriods: "Peaks during course registration windows (Jan-Feb and Jul-Aug)",
+  productAdvantages: "Streamlined advising, real-time course eligibility checks, tailored suggestions",
+  upcomingProducts: "Mobile app version, GPA tracker, peer study group finder",
+  preferredCampaigns: "Success story spotlights, student ambassador content, giveaways",
+  customerRelationship: "Active support on WhatsApp and email, in-app feedback prompts",
+  contentPreferences: "Visual explainers, short videos, student testimonials",
+  audienceInteractions: "Polls, Q&As, interactive planners",
+  targetingStrategy: "Behavioral and interest-based targeting using social ads",
+  audienceInterestsOutside: "Gaming, tech trends, career development",
+  measurementPreferences: "Monthly performance dashboards, in-depth quarterly reviews",
+  reportPreferences: "Google Data Studio + PDF executive summaries",
+  previousChallenges: "Low visibility among students, limited feedback loops",
+  expansionConcerns: "Adapting content and features for non-IS majors",
+  customerSupport: "In-app chat, chatbot integration planned, email support within 24h",
+  customerExperience: "Smooth onboarding, personalized dashboards, gamified planning",
+  designPreferences: "Minimalist, youthful, modern UI with blue and green color palette",
+  photographyStyle: "Candid student life photos, high-energy campus moments",
+  peakPeriods: "Two weeks before and after registration opens",
+  specificTimeframes: "Soft launch by August 15th, promotional blitz by September 1st",
+  fiveYearVision: "To become the leading academic support platform in the MENA region",
+  expansionPlans: "Integrate with 50+ universities, expand to include high school planning tools"
 
 ${JSON.stringify([
   {
-    slideName: "04 - How It Works",
-    type: "blank-card",
-    className:
-      "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-green-400 to-blue-500 text-white rounded-2xl shadow-lg",
-    content: {
-      id: "col-04-how-it-works",
-      type: "column",
-      name: "Column",
-      content: [
-        {
-          id: "title-04",
-          type: "title",
-          name: "Main Title",
-          content: "How PowerSlide Works",
-          placeholder: "Presentation Title",
-        },
-        {
-          id: "heading-04",
-          type: "heading1",
-          name: "Subtitle",
-          content: "Simple Steps to Create Amazing Slides",
-          placeholder: "Subtitle",
-        },
-        {
-          id: "olist-04",
-          type: "numberedList",
-          name: "Steps List",
-          content: [
-            "Choose a template",
-            "Drag & drop elements",
-            "Customize your design",
-            "Export and share",
-          ],
-        },
-      ],
+    "slideName": "Blank card",
+    "type": "blank-card",
+    "className": "p-8 mx-auto flex justify-center items-center min-h-[200px]",
+    "content": {
+      "id": "contentN",
+      "type": "column",
+      "name": "Column",
+      "content": [
+        { "id": "titleN", "type": "title",        "name": "Title",     "content": "", "placeholder": "Untitled Card" },
+        { "id": "paragraphN", "type": "paragraph","name": "Paragraph", "content": "", "placeholder": "Start typing..." }
+      ]
     },
-    id: "slide-04",
-    slideOrder: 3,
-    elements: [],
+    "id": "slideN",
+    "slideOrder": "N-1",
+    "elements": []
   },
   {
-    slideName: "05 - Best Practices",
-    type: "threeColumnsWithHeadings",
-    className:
-      "p-6 mx-auto flex justify-center items-start gap-6 rounded-2xl shadow-md",
-    content: {
-      id: "col-05-best-practices",
-      type: "column",
-      name: "Column",
-      content: [
-        {
-          id: "title-05",
-          type: "title",
-          name: "Section Title",
-          content: "Presentation Best Practices",
-          placeholder: "Untitled Card",
-        },
-        {
-          id: "cols-05",
-          type: "resizable-column",
-          name: "Tips Columns",
-          className: "flex gap-4",
-          content: [
-            {
-              id: "f1-05",
-              type: "column",
-              name: "Tip 1",
-              content: [
-                {
-                  id: "h3-05-1",
-                  type: "heading3",
-                  name: "Heading",
-                  content: "Keep It Simple",
-                  placeholder: "Heading",
-                },
-                {
-                  id: "olist-05-1",
-                  type: "numberedList",
-                  name: "Steps",
-                  content: [
-                    "Limit text per slide",
-                    "Use clear visuals",
-                    "Focus on key points",
-                  ],
-                },
-              ],
-            },
-            {
-              id: "f2-05",
-              type: "column",
-              name: "Tip 2",
-              content: [
-                {
-                  id: "h3-05-2",
-                  type: "heading3",
-                  name: "Heading",
-                  content: "Stay Consistent",
-                  placeholder: "Heading",
-                },
-                {
-                  id: "olist-05-2",
-                  type: "numberedList",
-                  name: "Steps",
-                  content: [
-                    "Same fonts & colors",
-                    "Aligned elements",
-                    "Smooth transitions",
-                  ],
-                },
-              ],
-            },
-            {
-              id: "f3-05",
-              type: "column",
-              name: "Tip 3",
-              content: [
-                {
-                  id: "h3-05-3",
-                  type: "heading3",
-                  name: "Heading",
-                  content: "Engage Your Audience",
-                  placeholder: "Heading",
-                },
-                {
-                  id: "olist-05-3",
-                  type: "numberedList",
-                  name: "Steps",
-                  content: [
-                    "Ask questions",
-                    "Tell stories",
-                    "Use humor wisely",
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "para-05",
-          type: "paragraph",
-          name: "Summary",
-          content:
-            "Following these tips will help you deliver presentations that are both memorable and impactful.",
-          placeholder: "Start typing...",
-        },
-      ],
+    "slideName": "Blank card",
+    "type": "blank-card",
+    "className": "p-8 mx-auto flex justify-center items-center min-h-[200px]",
+    "content": {
+      "id": "contentN",
+      "type": "column","name": "Column","content": [
+        { "id": "titleN",  "type": "title",      "name": "Title",        "content": "", "placeholder": "Untitled Card" },
+        { "id": "loj4jol7x9","type":"bulletList","name":"Bullet List","content":[]},
+        { "id": "uwy6sroraa","type":"tableOfContents","name":"Table of Contents","content":[]}
+      ]
     },
-    id: "slide-05",
-    slideOrder: 4,
-    elements: [],
+    "id": "slideN",
+    "slideOrder": "N-1",
+    "elements": []
   },
   {
-    slideName: "06 - Thank You",
-    type: "fourColumns",
-    className: "p-6 rounded-2xl shadow-sm",
-    content: {
-      id: "col-06-thank-you",
-      type: "column",
-      name: "Column",
-      content: [
-        {
-          id: "title-06",
-          type: "title",
-          name: "Section Title",
-          content: "Thank You!",
-          placeholder: "Untitled Card",
-        },
-        {
-          id: "quote-06",
-          type: "blockquote",
-          name: "Blockquote",
-          content: "Great presentations create great opportunities.",
-          placeholder: "Type here",
-        },
-        {
-          id: "divider-06",
-          type: "divider",
-          name: "Divider",
-          content: "",
-        },
-        {
-          id: "olist-06",
-          type: "numberedList",
-          name: "Closing Actions",
-          content: [
-            "Review your slides",
-            "Practice your delivery",
-            "Wow your audience!",
-          ],
-        },
-      ],
+    "slideName": "Blank card",
+    "type": "blank-card",
+    "className":"p-8 mx-auto flex justify-center items-center min-h-[200px]",
+    "content": {
+      "id":"contentN","type":"column","name":"Column","content":[
+        { "id":"titleN","type":"title","name":"Title","content":"","placeholder":"Untitled Card" },
+        { "id":"dxzu7ggiudi","type":"table","name":"Table","initialRows":"X","initialColumns":"Y","content":[]}
+      ]
     },
-    id: "slide-06",
-    slideOrder: 5,
-    elements: [],
+    "id":"slideN","slideOrder":"N-1"
   },
-])}
+  {
+    "slideName":"Three columns with headings","type":"threeColumnsWithHeadings",
+    "className":"p-4 mx-auto flex justify-center items-center",
+    "content": { /* same nested structure as your example, with calloutBox, divider, resizable-column, 3 subcolumns of numberedList or bulletList */ }
+  },
+  {
+    "slideName":"Accent left","type":"accentLeft","className":"min-h-[300px]",
+    "content": { /* same nested structure as your example, with heading3, paragraphs, resizable-column text/image, heading2, paragraph */ }
+  }
+]
+)}
+`
 
-return only json using this strucure of slides return like this slides 15 slide and do not return with slide any hints or description only JSON and do not return any additional text with the response.`;
 
       const completion = [
         {
@@ -473,296 +723,31 @@ return only json using this strucure of slides return like this slides 15 slide 
           role: "model",
           parts: [
             {
-              text: JSON.stringify([
-                {
-                  slideName: "01 - Executive Summary",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-green-400 to-blue-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-01-executive-summary",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-01",
-                        type: "title",
-                        name: "Main Title",
-                        content: "EduBoost Marketing Plan",
-                      },
-                      {
-                        id: "heading-01",
-                        type: "heading1",
-                        name: "Subtitle",
-                        content: "August 2025 - September 2026",
-                      },
-                      {
-                        id: "summary-01",
-                        type: "paragraph",
-                        name: "Summary",
-                        content:
-                          "A comprehensive marketing plan to drive user acquisition and engagement for the EduBoost academic advising platform, focusing on the MENA region.",
-                      },
-                    ],
-                  },
-                  id: "slide-01",
-                  slideOrder: 1,
-                  elements: [],
-                },
-                {
-                  slideName: "02 - Current Situation Analysis",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-blue-500 to-purple-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-02-current-situation",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-02",
-                        type: "title",
-                        name: "Current Situation",
-                        content: "EduBoost - Competitive Landscape",
-                      },
-                      {
-                        id: "analysis-02",
-                        type: "paragraph",
-                        name: "Analysis",
-                        content:
-                          "Existing competitor analysis, brand awareness, marketing budget, and initial marketing efforts.",
-                      },
-                    ],
-                  },
-                  id: "slide-02",
-                  slideOrder: 2,
-                  elements: [],
-                },
-                {
-                  slideName: "03 - Target Audience",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-purple-500 to-pink-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-03-target-audience",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-03",
-                        type: "title",
-                        name: "Target Audience",
-                        content: "Defining Buyer Personas",
-                      },
-                      {
-                        id: "personas-03",
-                        type: "paragraph",
-                        name: "Buyer Personas",
-                        content:
-                          "Detailed buyer persona creation, segmentation by interests, and behaviors",
-                      },
-                    ],
-                  },
-                  id: "slide-03",
-                  slideOrder: 3,
-                  elements: [],
-                },
-                {
-                  slideName: "04 - Marketing Goals",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-pink-500 to-red-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-04-marketing-goals",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-04",
-                        type: "title",
-                        name: "SMART Marketing Goals",
-                        content: "Detailed SMART Goals",
-                      },
-                      {
-                        id: "goals-04",
-                        type: "paragraph",
-                        name: "Goal Definition",
-                        content:
-                          "Specific, Measurable, Achievable, Relevant, Time-bound goals for user acquisition.",
-                      },
-                    ],
-                  },
-                  id: "slide-04",
-                  slideOrder: 4,
-                  elements: [],
-                },
-                {
-                  slideName: "05 - Content Strategy",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-red-500 to-orange-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-05-content-strategy",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-05",
-                        type: "title",
-                        name: "Content Pillars",
-                        content: "Content pillars and examples",
-                      },
-                      {
-                        id: "content-examples-05",
-                        type: "paragraph",
-                        name: "Content Pillars",
-                        content:
-                          "Content examples for different stages of the user journey and platforms.",
-                      },
-                    ],
-                  },
-                  id: "slide-05",
-                  slideOrder: 5,
-                  elements: [],
-                },
-                {
-                  slideName: "06 - Advertising Campaign",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-orange-500 to-yellow-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-06-advertising-campaign",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-06",
-                        type: "title",
-                        name: "Advertising Strategy",
-                        content: "Campaign details",
-                      },
-                      {
-                        id: "details-06",
-                        type: "paragraph",
-                        name: "Campaign Details",
-                        content: "Budget Allocation, Targeting, Platforms.",
-                      },
-                    ],
-                  },
-                  id: "slide-06",
-                  slideOrder: 6,
-                  elements: [],
-                },
-                {
-                  slideName: "07 - Marketing Channels",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-yellow-500 to-green-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-07-marketing-channels",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-07",
-                        type: "title",
-                        name: "Marketing Channels",
-                        content: "Detailed channel breakdown",
-                      },
-                      {
-                        id: "channels-07",
-                        type: "paragraph",
-                        name: "Channel Breakdown",
-                        content:
-                          "Social Media, Offline, Influencer, Partnerships",
-                      },
-                    ],
-                  },
-                  id: "slide-07",
-                  slideOrder: 7,
-                  elements: [],
-                },
-                {
-                  slideName: "08 - KPIs & Measurement",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-green-500 to-teal-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-08-kpis",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-08",
-                        type: "title",
-                        name: "Key Performance Indicators",
-                        content: "Detailed KPIs",
-                      },
-                      {
-                        id: "kpis-08",
-                        type: "paragraph",
-                        name: "KPI Definition",
-                        content:
-                          "Monthly/Quarterly Performance Dashboard, Reporting Metrics.",
-                      },
-                    ],
-                  },
-                  id: "slide-08",
-                  slideOrder: 8,
-                  elements: [],
-                },
-                {
-                  slideName: "09 - Solutions & Recommendations",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-teal-500 to-sky-500 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-09-solutions",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-09",
-                        type: "title",
-                        name: "Proactive Solutions",
-                        content: "Solutions and recommendations",
-                      },
-                      {
-                        id: "recommendations-09",
-                        type: "paragraph",
-                        name: "Solutions and Recommendations",
-                        content:
-                          "Addressing challenges, optimizing strategies, proactive solutions to maximize success.",
-                      },
-                    ],
-                  },
-                  id: "slide-09",
-                  slideOrder: 9,
-                  elements: [],
-                },
-                {
-                  slideName: "10 - Appendix",
-                  type: "blank-card",
-                  className:
-                    "p-8 mx-auto flex flex-col justify-center items-center min-h-[200px] bg-gradient-to-tr from-sky-500 to-purple-600 text-white rounded-2xl shadow-lg",
-                  content: {
-                    id: "col-10-appendix",
-                    type: "column",
-                    name: "Column",
-                    content: [
-                      {
-                        id: "title-10",
-                        type: "title",
-                        name: "Appendix",
-                        content: "Supporting Information",
-                      },
-                    ],
-                  },
-                  id: "slide-10",
-                  slideOrder: 10,
-                  elements: [],
-                },
-              ]),
+              text: `Guidelines
+I will provide you with a pattern and a format to follow, and for each outline, you must generate unique layouts and contents in the specified JSON format.
+
+### Layout Types
+Available LAYOUTS TYPES: 
+"accentLeft", "accentRight", "imageAndText", "textAndImage", "twoColumns", 
+"twoColumnsWithHeadings", "threeColumns", "threeColumnsWithHeadings", 
+"fourColumns", "twoImageColumns", "threeImageColumns", "fourImageColumns", "tableLayout"
+
+### Content Types
+Available CONTENT TYPES: 
+"heading1", "heading2", "heading3", "heading4", "title", "paragraph", 
+"table", "resizable-column", "image", "blockquote", "numberedList", 
+"bulletList", "todolist", "calloutBox", "codeBlock", "tableOfContents", 
+"divider", "column"
+
+### Instructions
+1. Ensure each layout is unique
+2. Follow this structure exactly:
+   - Top level: Layout object
+   - content property starts with "column"
+   - Nested content uses appropriate content types
+   - Arrays for multi-element containers
+   - Strings for static content
+`,
             },
           ],
         },
@@ -952,7 +937,8 @@ return only json using this strucure of slides return like this slides 15 slide 
   };
 
   const renderStep = () => {
-    if (isComplete) return <FormComplete output={generatedOutput} projectId={projectId} />;
+    if (isComplete)
+      return <FormComplete output={generatedOutput} projectId={projectId} />;
     switch (currentStep) {
       case 0:
         return (
@@ -1016,6 +1002,10 @@ return only json using this strucure of slides return like this slides 15 slide 
             formData={formData}
             updateFormData={updateFormData}
           />
+        );
+      case 11:
+        return (
+          <FormEditAi formData={formData} updateFormData={updateFormData} />
         );
       default:
         return (
@@ -1112,7 +1102,7 @@ return only json using this strucure of slides return like this slides 15 slide 
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Generate Presentation
+                    Generate Plan
                   </>
                 )}
               </Button>

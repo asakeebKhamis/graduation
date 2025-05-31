@@ -89,6 +89,9 @@
   .text-ufo {
     @apply bg-gradient-to-b from-amber-500 to-amber-700 bg-clip-text text-transparent;
   }
+  .bg-ufo {
+    @apply bg-gradient-to-b from-amber-500 to-amber-700;
+  }
 }
 
 ::-webkit-scrollbar {

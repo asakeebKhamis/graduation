@@ -308,9 +308,8 @@ Available CONTENT TYPES:
 "divider", "column"
 
 ### Instructions
-1. Create layouts based on these outlines: ${JSON.stringify(outlineArray)}
-2. Ensure each layout is unique
-3. Follow this structure exactly:
+1. Ensure each layout is unique
+2. Follow this structure exactly:
    - Top level: Layout object
    - content property starts with "column"
    - Nested content uses appropriate content types

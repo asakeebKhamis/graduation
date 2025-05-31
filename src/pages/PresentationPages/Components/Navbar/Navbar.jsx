@@ -14,30 +14,39 @@ import {
 } from "lucide-react";
 import PresentationMode from "./PresentationMode";
 import { Input } from "../../../../components/ui/input";
-import { presentationAPI } from "src/lib/api";
+import { ErrorMessage, presentationAPI } from "../../../../lib/api";
 
-export const Navbar = ({ presentationId }) => {
+export const Navbar = ({ presentationId, isEditable }) => {
   const { currentTheme, isSaving, project } = useStore();
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [title, setTitle] = useState(project?.title || "Presentation Editor");
+  const [loadingShared, setLoadingShared] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/share/${presentationId}`
-    );
-    toast.success("Link Copied", {
-      description: "The link has been copied to your clipboard",
-    });
+  const handleCopy = async () => {
+    try {
+      setLoadingShared(true);
+      await presentationAPI.shared(presentationId);
+
+      navigator.clipboard.writeText(
+        `${window.location.origin}/share/${presentationId}`
+      );
+      toast.success("Link Copied", {
+        description: "The link has been copied to your clipboard",
+      });
+    } catch (error) {
+      toast("Error", { description: ErrorMessage(error) });
+    } finally {
+      setLoadingShared(false);
+    }
   };
 
   useEffect(() => {
+    if (!isEditable) return;
     const updatePresentaion = async () => {
       try {
         await presentationAPI.update(presentationId, { title });
       } catch (error) {
-        toast.error("Error", {
-          description: "An unexpected error occurred",
-        });
+        toast("Error", { description: ErrorMessage(error) });
       }
     };
     const timeOut = setTimeout(() => {
@@ -51,14 +60,14 @@ export const Navbar = ({ presentationId }) => {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 w-full h-20 flex justify-between items-center py-4 px-7 border-b"
+      className="fixed top-0 left-0 right-0 z-50 w-full h-20 flex justify-between items-center py-4 px-7 border-b-2"
       style={{
         backgroundColor:
           currentTheme.navbarColor || currentTheme.backgroundColor,
         color: currentTheme.accentColor,
       }}
     >
-      <Link to="/dashboard" passHref>
+      <Link to="/" replace>
         <Button
           variant="outline"
           className="flex items-center gap-2"
@@ -76,30 +85,38 @@ export const Navbar = ({ presentationId }) => {
         onChange={(e) => {
           setTitle(e.target.value);
         }}
+        readOnly={!isEditable}
       />
 
       <div
         className="flex items-center gap-4"
         style={{ color: currentTheme.accentColor }}
       >
-        <div className="flex items-center gap-1">
-          {isSaving ? (
-            <>
-              <Loader2 className="animate-spin w-5 h-5" /> Saving...
-            </>
-          ) : (
-            <>
-              <CloudLightningIcon className="w-5 h-5" /> Saved
-            </>
-          )}
-        </div>
+        {isEditable && (
+          <div className="flex items-center gap-1">
+            {isSaving ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" /> Saving...
+              </>
+            ) : (
+              <>
+                <CloudLightningIcon className="w-5 h-5" /> Saved
+              </>
+            )}
+          </div>
+        )}
 
         <Button
           variant="outline"
           style={{ backgroundColor: currentTheme.backgroundColor }}
           onClick={handleCopy}
+          disabled={loadingShared}
         >
-          <Share className="w-4 h-4" />
+          {loadingShared ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <Share className="w-4 h-4" />
+          )}
         </Button>
 
         <Button
